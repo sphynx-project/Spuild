@@ -1,3 +1,3 @@
-# Spbuild (Sphynx Build)
+# Spuild (Sphynx Build)
 
 A build system.
