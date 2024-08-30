@@ -6,12 +6,73 @@ EXE="spuild"
 CC="gcc"
 CFLAGS="-Wall -Wextra -O2"
 NUM_JOBS=$(nproc)
+FORCE_REBUILD=0
+
+print_help() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  -B, --rebuild       Force rebuild of all source files."
+    echo "  -c, --clean         Clean the build directory."
+    echo "  -j, --jobs <N>      Set the number of parallel jobs (default: number of CPU cores)."
+    echo "  -o, --output <FILE> Set the name of the output executable (default: spuild)."
+    echo "  -h, --help          Display this help message and exit."
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -B|--rebuild)
+            FORCE_REBUILD=1
+            shift
+            ;;
+        -c|--clean)
+            echo -e "\033[1;33mCleaning\033[0m $OBJ_DIR"
+            rm -rf "$OBJ_DIR"/*
+            echo -e "\033[1;32mClean complete!\033[0m"
+            exit 0
+            ;;
+        -j|--jobs)
+            if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
+                NUM_JOBS="$2"
+                shift 2
+            else
+                echo "Error: --jobs requires a numerical argument."
+                exit 1
+            fi
+            ;;
+        -o|--output)
+            if [[ -n "$2" ]]; then
+                EXE="$2"
+                shift 2
+            else
+                echo "Error: --output requires a filename."
+                exit 1
+            fi
+            ;;
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            print_help
+            exit 1
+            ;;
+    esac
+done
 
 mkdir -p "$OBJ_DIR"
 
 compile_source() {
     src_file="$1"
     obj_file="${OBJ_DIR}/$(basename "${src_file%.*}.o")"
+
+    if [[ $FORCE_REBUILD -eq 0 && -f "$obj_file" && "$obj_file" -nt "$src_file" ]]; then
+        echo -e "\033[1;36mSkipping\033[0m $src_file -> $obj_file (up to date)"
+        return
+    fi
+
     echo -e "\033[1;34mCompiling\033[0m $src_file -> $obj_file"
     if ! $CC $CFLAGS -c "$src_file" -o "$obj_file" 2>&1; then
         echo -e "\033[1;31mFailed to compile $src_file\033[0m"
