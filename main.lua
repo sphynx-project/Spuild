@@ -1,9 +1,11 @@
 local config = require("config")
+local Logger, LoggerScope = require("src.modules.logger").Logger, require("src.modules.logger").LoggerScope
 
 local function main()
-    print("Default Entry: " .. config.defaultEntry)
-    print("Default Recipe: " .. config.defaultRecepie)
-    print("Default File Name Pattern: " .. config.defaultFileNamePattern)
+    local mainScope = LoggerScope:new("main")
+    local logger = Logger:new(mainScope);
+    mainScope:log("This is a test message.")
+    logger:log("Hello");
 end
 
 main()
