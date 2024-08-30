@@ -1,6 +1,7 @@
 local config = {
-    defaultRecepieEntryFile = ".spbuild",
-    defaultRecepieFile = ".spbuild.build",
+    defaultEntry = ".spbuild",
+    defaultRecepie = "build",
+    defaultFileNamePattern = ".spbuild.{recepie}"
 }
 
 return config
