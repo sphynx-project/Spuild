@@ -3,8 +3,11 @@
 SRC_DIR="src"
 OBJ_DIR="build"
 EXE="spuild"
+
 CC="gcc"
-CFLAGS="-Wall -Wextra -O2"
+
+CFLAGS="-Wall -Wextra -O2 -largp"
+
 NUM_JOBS=$(nproc)
 FORCE_REBUILD=0
 
